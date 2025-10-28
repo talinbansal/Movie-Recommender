@@ -126,7 +126,7 @@ function Create() {
       return;
     }
     try {
-      const url = `http://localhost:5050/add_user?username=${username}&password=${password}&setup=${false}`;
+      const url = `https://api.popcornpick.app/add_user?username=${username}&password=${password}&setup=${false}`;
       const response = await fetch(url);
 
       if (!response.ok) {
