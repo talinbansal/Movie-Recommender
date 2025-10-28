@@ -13,6 +13,7 @@ from flask_cors import CORS
 from db import conn, s3, BUCKET
 import logging
 from model import vectorize
+import threading
 logging.basicConfig(level=logging.DEBUG)
 
 import pandas as pd
@@ -20,6 +21,24 @@ import pandas as pd
 ## Flask App Initialization
 app = Flask(__name__, instance_relative_config=True)
 CORS(app, supports_credentials=True)  #origins=["http://localhost:5173"]
+
+model_loaded = False
+
+def load_model():
+    global model_loaded
+    vectorize.load()  # Call your model's load function here
+    model_loaded = True
+    logging.info("Model loaded!")
+
+# Start loading in background immediately on app startup
+threading.Thread(target=load_model, daemon=True).start()
+
+@app.route("/warmup")
+def warmup():
+    if model_loaded:
+        return jsonify({"status": "Model already loaded"})
+    else:
+        return jsonify({"status": "Model loading, please wait"}), 503
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 
