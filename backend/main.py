@@ -849,7 +849,8 @@ def fetch_profile_pic():
             cur.close()
             
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5050, debug=True)
+    port = int(os.environ.get("PORT", 5050))  # use Railway's PORT or default to 5050 locally
+    app.run(host="0.0.0.0", port=port, debug=True)
 
 ## Run Command flask --app main.py run --host=localhost --port=5050
 
