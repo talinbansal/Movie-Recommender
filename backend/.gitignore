@@ -1,0 +1,6 @@
+# .gitignore (place in backend/)
+__pycache__/
+*.pyc
+.env
+venv/
+.env.production

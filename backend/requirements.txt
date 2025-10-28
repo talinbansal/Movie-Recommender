@@ -1,0 +1,14 @@
+flask
+flask-cors
+gunicorn
+pandas
+numpy
+faiss-cpu
+sentence-transformers
+python-dotenv
+bcrypt
+requests
+psycopg2-binary
+boto3
+
+
