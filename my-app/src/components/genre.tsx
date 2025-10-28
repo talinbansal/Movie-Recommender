@@ -21,7 +21,7 @@ function Genre() {
 
   const fetchMovies = async () => {
     try {
-      const url = `https://www.popcornpick.app/genre_sort?genre=${genreId}&page=${pageNum}`;
+      const url = `https://api.popcornpick.app/genre_sort?genre=${genreId}&page=${pageNum}`;
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

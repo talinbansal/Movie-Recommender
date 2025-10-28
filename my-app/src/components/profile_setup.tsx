@@ -30,7 +30,7 @@ function ProfileSetup() {
   useEffect(() => {
     const genres = async () => {
       try {
-        const url = "https://www.popcornpick.app/load_genres";
+        const url = "https://api.popcornpick.app/load_genres";
         const response = await fetch(url, { credentials: "include" });
 
         if (!response.ok) {
@@ -83,7 +83,7 @@ function ProfileSetup() {
     if (!searchTerm.trim()) return;
 
     try {
-      const url = `https://www.popcornpick.app/search_fav_movie?movie=${searchTerm}`;
+      const url = `https://api.popcornpick.app/search_fav_movie?movie=${searchTerm}`;
       const resp = await fetch(url);
 
       if (!resp.ok) {
@@ -118,7 +118,7 @@ function ProfileSetup() {
       formData.append("genres", JSON.stringify(selectedGenres));
       formData.append("movies", JSON.stringify(favoriteMovies));
 
-      const url = `https://www.popcornpick.app/add_user_complete`;
+      const url = `https://api.popcornpick.app/add_user_complete`;
       const response = await fetch(url, { method: "POST", body: formData });
 
       if (!response.ok) {
@@ -146,7 +146,7 @@ function ProfileSetup() {
 
   const handleSkip = async () => {
     try {
-      const url = `https://www.popcornpick.app/add_user?username=${user}&password=${pass}&setup=${true}&genres=${encodeURIComponent(
+      const url = `https://api.popcornpick.app/add_user?username=${user}&password=${pass}&setup=${true}&genres=${encodeURIComponent(
         JSON.stringify(selectedGenres)
       )}&movies=${encodeURIComponent(JSON.stringify(favoriteMovies))}`;
       const response = await fetch(url);
@@ -174,7 +174,7 @@ function ProfileSetup() {
 
   const handleSkipExists = async () => {
     try {
-      const url = `https://www.popcornpick.app/add_user?username=${user}&setup=exists&genres=${encodeURIComponent(
+      const url = `https://api.popcornpick.app/add_user?username=${user}&setup=exists&genres=${encodeURIComponent(
         JSON.stringify(selectedGenres)
       )}&movies=${encodeURIComponent(JSON.stringify(favoriteMovies))}`;
       const response = await fetch(url);

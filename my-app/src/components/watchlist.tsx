@@ -15,7 +15,7 @@ function WatchList() {
 
   const fetchMovies = async () => {
     try {
-      const url = "https://www.popcornpick.app/get_watchlist";
+      const url = "https://api.popcornpick.app/get_watchlist";
       const response = await fetch(url, { credentials: "include" });
 
       if (!response.ok) {

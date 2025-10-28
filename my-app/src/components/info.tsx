@@ -23,7 +23,7 @@ function Info() {
 
   const getInfo = async () => {
     try {
-      const url = "https://www.popcornpick.app/get_latest_releases";
+      const url = "https://api.popcornpick.app/get_latest_releases";
       const response = await fetch(url);
 
       if (!response.ok) {
@@ -40,7 +40,7 @@ function Info() {
 
   const getTrending = async () => {
     try {
-      const url = `https://www.popcornpick.app/trending`;
+      const url = `https://api.popcornpick.app/trending`;
       const resp = await fetch(url);
 
       if (!resp.ok) {
@@ -57,7 +57,7 @@ function Info() {
 
   const getTopRated = async () => {
     try {
-      const url = `https://www.popcornpick.app/top_rated`;
+      const url = `https://api.popcornpick.app/top_rated`;
       const resp = await fetch(url);
 
       if (!resp.ok) {

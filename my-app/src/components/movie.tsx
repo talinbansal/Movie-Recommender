@@ -60,7 +60,7 @@ function Movie() {
   // API calls to Fetch Movie Details
   const getTitle = async () => {
     try {
-      const url = `http://localhost:5050/get_title?id=${id}`;
+      const url = `https://api.popcornpick.app/get_title?id=${id}`;
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -74,7 +74,7 @@ function Movie() {
   };
 
   const getData = async () => {
-    const url = `https://www.popcornpick.app/search_recommended?movies=${title}`;
+    const url = `https://api.popcornpick.app/search_recommended?movies=${title}`;
     const response = await fetch(url);
 
     try {
@@ -98,7 +98,7 @@ function Movie() {
     id,
   }: storeMovieProps) => {
     try {
-      const url = `https://www.popcornpick.app/add_to_watchlist?title=${title}&poster_path=${poster_path}&genres=${genres}&id=${id}`;
+      const url = `https://api.popcornpick.app/add_to_watchlist?title=${title}&poster_path=${poster_path}&genres=${genres}&id=${id}`;
       const response = await fetch(url, { credentials: "include" });
 
       if (!response.ok) {
@@ -118,7 +118,7 @@ function Movie() {
     genres,
   }: storeMovieProps) => {
     try {
-      const url = `https://www.popcornpick.app/remove_from_watchlist?title=${title}&poster_path=${poster_path}&genres=${genres}`;
+      const url = `https://api.popcornpick.app/remove_from_watchlist?title=${title}&poster_path=${poster_path}&genres=${genres}`;
       const response = await fetch(url, { credentials: "include" });
 
       if (!response.ok) {
@@ -135,7 +135,7 @@ function Movie() {
   // API call to Check if Movie is Already in Watchlist
   const checkDB = async (poster_path: string) => {
     try {
-      const url = `https://www.popcornpick.app/check_watchlist?poster_path=${poster_path}`;
+      const url = `https://api.popcornpick.app/check_watchlist?poster_path=${poster_path}`;
       const response = await fetch(url, { credentials: "include" });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -151,7 +151,7 @@ function Movie() {
   // API calls to Fetch and Update Comments
   const updateComments = async () => {
     try {
-      const url = `https://www.popcornpick.app/update_comments?comment=${comment}&movie_id=${id}`;
+      const url = `https://api.popcornpick.app/update_comments?comment=${comment}&movie_id=${id}`;
       const resp = await fetch(url, { credentials: "include" });
 
       if (!resp.ok) {
@@ -167,7 +167,7 @@ function Movie() {
 
   const fetchComments = async () => {
     try {
-      const url = `https://www.popcornpick.app/fetch_comments?movie_id=${id}`;
+      const url = `https://api.popcornpick.app/fetch_comments?movie_id=${id}`;
       const resp = await fetch(url, { credentials: "include" });
 
       if (!resp.ok) {
@@ -186,7 +186,7 @@ function Movie() {
   // API call to Store Movie Rating
   const updateUserRating = async (newRating: Number) => {
     try {
-      const url = `https://www.popcornpick.app/update_user_rating?movie_id=${id}&rating=${newRating}`;
+      const url = `https://api.popcornpick.app/update_user_rating?movie_id=${id}&rating=${newRating}`;
       const resp = await fetch(url, { credentials: "include" });
 
       if (!resp.ok) {
@@ -202,7 +202,7 @@ function Movie() {
 
   const updateAvgRating = async () => {
     try {
-      const url = `https://www.popcornpick.app/update_avg_rating?movie_id=${id}`;
+      const url = `https://api.popcornpick.app/update_avg_rating?movie_id=${id}`;
       const resp = await fetch(url, { credentials: "include" });
 
       if (!resp.ok) {
@@ -219,7 +219,7 @@ function Movie() {
   // API call to Fetch Movie Ratings
   const fetchRating = async () => {
     try {
-      const url = `https://www.popcornpick.app/fetch_rating?movie_id=${id}`;
+      const url = `https://api.popcornpick.app/fetch_rating?movie_id=${id}`;
       const resp = await fetch(url, { credentials: "include" });
 
       if (!resp.ok) {
