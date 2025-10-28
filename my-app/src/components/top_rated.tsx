@@ -15,7 +15,7 @@ function TopRated() {
 
   const getTopRated = async () => {
     try {
-      const url = `http://localhost:5050/more_top_rated?page_num=${page}`;
+      const url = `https://www.popcornpick.app/more_top_rated?page_num=${page}`;
       const resp = await fetch(url);
 
       if (!resp.ok) {

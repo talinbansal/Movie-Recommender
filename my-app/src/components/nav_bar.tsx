@@ -15,7 +15,7 @@ function NavBar({ setRecs }: NavBarProps) {
 
   const genres = async () => {
     try {
-      const url = "http://localhost:5050/load_genres";
+      const url = "https://www.popcornpick.app/load_genres";
       const response = await fetch(url, { credentials: "include" });
 
       if (!response.ok) {
@@ -32,7 +32,7 @@ function NavBar({ setRecs }: NavBarProps) {
 
   const fetchUpload = async () => {
     try {
-      const url = `http://localhost:5050/fetch_profile_pic`;
+      const url = `https://www.popcornpick.app/fetch_profile_pic`;
       const resp = await fetch(url, { credentials: "include" });
 
       if (!resp.ok) {
@@ -48,7 +48,7 @@ function NavBar({ setRecs }: NavBarProps) {
 
   const handleLogout = async () => {
     try {
-      const url = "http://localhost:5050/logout";
+      const url = "https://www.popcornpick.app/logout";
       const response = await fetch(url, {
         credentials: "include",
       });

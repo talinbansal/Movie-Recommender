@@ -10,7 +10,7 @@ function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   useEffect(() => {
     const checkSession = async () => {
-      const res = await fetch("http://localhost:5050/check_session", {
+      const res = await fetch("https://www.popcornpick.app/check_session", {
         credentials: "include",
       });
       const data = await res.json();

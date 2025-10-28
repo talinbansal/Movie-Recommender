@@ -22,7 +22,7 @@ function Profile() {
 
   const getData = async () => {
     try {
-      const url = "http://localhost:5050/get_user_data";
+      const url = "https://www.popcornpick.app/get_user_data";
       const resp = await fetch(url, { credentials: "include" });
 
       if (!resp.ok) {
@@ -40,7 +40,7 @@ function Profile() {
 
   const getStats = async () => {
     try {
-      const url = "http://localhost:5050/get_user_stats";
+      const url = "https://www.popcornpick.app/get_user_stats";
       const resp = await fetch(url, { credentials: "include" });
 
       if (!resp.ok) {
@@ -56,7 +56,7 @@ function Profile() {
 
   const fetchUpload = async () => {
     try {
-      const url = `http://localhost:5050/fetch_profile_pic`;
+      const url = `https://www.popcornpick.app/fetch_profile_pic`;
       const resp = await fetch(url, { credentials: "include" });
 
       if (!resp.ok) {
@@ -102,7 +102,7 @@ function Profile() {
 
   const handleDeleteProfile = async () => {
     try {
-      const url = "http://localhost:5050/delete_user";
+      const url = "https://www.popcornpick.app/delete_user";
       const response = await fetch(url, {
         method: "DELETE",
         credentials: "include",

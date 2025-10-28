@@ -16,7 +16,7 @@ function Search({ setRecs, setSearched, searched, recs }: SearchProps) {
   const getRecommendations = async (movie: string) => {
     setSearched(movie);
     try {
-      const url = `http://localhost:5050/recommend?title=${movie}`;
+      const url = `https://www.popcornpick.app/recommend?title=${movie}`;
       const response = await fetch(url);
 
       if (!response.ok) {

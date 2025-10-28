@@ -54,7 +54,7 @@ function API({ recs }: APIProps) {
         .map((title) => `movies=${encodeURIComponent(title)}`)
         .join("&");
       console.log(query);
-      const url = `http://localhost:5050/search_recommended?${query}`;
+      const url = `https://www.popcornpick.app/search_recommended?${query}`;
       const response = await fetch(url);
 
       if (!response.ok) {

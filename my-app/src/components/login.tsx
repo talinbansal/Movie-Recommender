@@ -20,7 +20,7 @@ function Log() {
 
   const checkLogin = async ({ username, password }: loginProps) => {
     try {
-      const url = `http://localhost:5050/search_user?username=${username}&password=${password}`;
+      const url = `https://www.popcornpick.app/search_user?username=${username}&password=${password}`;
       const response = await fetch(url, { credentials: "include" });
 
       if (!response.ok) {
