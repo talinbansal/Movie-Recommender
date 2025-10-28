@@ -1,0 +1,10 @@
+@import 'tailwindcss';
+@plugin "daisyui";
+
+@custom-variant dark (&:where(.dark, .dark *)); 
+
+html, body {
+    @apply bg-black;
+  }
+
+  

@@ -1,0 +1,8 @@
+.container {
+    width: 100%;
+}
+
+.container img {
+    display: block;   /* makes it take full width line */
+    margin-left: 0; 
+}

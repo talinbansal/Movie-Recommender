@@ -2,7 +2,6 @@ flask
 flask-cors
 gunicorn
 pandas
-numpy
 faiss-cpu
 sentence-transformers
 python-dotenv
