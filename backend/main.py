@@ -12,7 +12,6 @@ import requests
 from flask_cors import CORS
 from db import conn, s3, BUCKET
 import logging
-import secrets
 from model import vectorize
 logging.basicConfig(level=logging.DEBUG)
 
