@@ -39,6 +39,10 @@ load_dotenv()
 API_KEY = os.getenv("API_KEY")
 API_TOKEN = os.getenv("API_TOKEN")
 
+@app.route("/")
+def health():
+    return "Backend is alive!"
+
 ## Endpoint for Session Check
 @app.route('/check_session', methods=['GET'])
 def check_session():
