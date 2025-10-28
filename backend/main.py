@@ -12,7 +12,7 @@ import requests
 from flask_cors import CORS
 from db import conn, s3, BUCKET
 import logging
-from model import vectorize
+import model
 import threading
 logging.basicConfig(level=logging.DEBUG)
 
@@ -26,19 +26,12 @@ model_loaded = False
 
 def load_model():
     global model_loaded
-    vectorize.load()  # Call your model's load function here
+    model.load()  # ✅ correct load function call
     model_loaded = True
-    logging.info("Model loaded!")
+    logging.info("✅ Model loaded!")
 
-# Start loading in background immediately on app startup
+# Start loading in the background
 threading.Thread(target=load_model, daemon=True).start()
-
-@app.route("/warmup")
-def warmup():
-    if model_loaded:
-        return jsonify({"status": "Model already loaded"})
-    else:
-        return jsonify({"status": "Model loading, please wait"}), 503
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 
@@ -95,7 +88,7 @@ def recommend():
                     break
             movie_data["cast"] = [cast.get("name") for cast in data.get("credits", {}).get("cast", [{}])[:5]]
             
-            recommendations = vectorize(movie_data)
+            recommendations = model.vectorize(movie_data)
         return jsonify({"recommendations": recommendations})
     
     return jsonify({"error": "Could not retrieve movie information"}), 500

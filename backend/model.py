@@ -4,30 +4,45 @@ import json
 
 from sentence_transformers import SentenceTransformer
 
-## Load Movie Data
-with open('movie_dataset.json', 'r') as f:
-    data = json.load(f)
+model = None
+movies = None
+index = None
+alpha = 0.6
+beta = 0.4
+    
+def load():
+    global model, movies, index
 
-movies = pd.DataFrame.from_dict(data, orient='index')
+    # Load Movie Data
+    with open('movie_dataset.json', 'r') as f:
+        data = json.load(f)
 
-# Sentence Transformer for overview
-model = SentenceTransformer('all-MiniLM-L6-v2') 
-overview_embeddings = model.encode(movies["overview"].tolist(), normalize_embeddings=True)
+    movies = pd.DataFrame.from_dict(data, orient='index')
 
-def combine_features(row):
-    return f"Genres: {row['genres']}. Cast: {row['cast']}. Director: {row['director']}."
+    # Load sentence transformer model once
+    model = SentenceTransformer('all-MiniLM-L6-v2')
+    overview_embeddings = model.encode(
+        movies["overview"].tolist(),
+        normalize_embeddings=True
+    )
 
-feature_texts = movies.apply(combine_features, axis=1).tolist()
-feature_embeddings = model.encode(feature_texts, normalize_embeddings=True)
+    def combine_features(row):
+        return f"Genres: {row['genres']}. Cast: {row['cast']}. Director: {row['director']}."
 
-alpha, beta = 0.6, 0.4  # overview vs categorical
-combined_embeddings = alpha * overview_embeddings + beta * feature_embeddings
+    feature_texts = movies.apply(combine_features, axis=1).tolist()
+    feature_embeddings = model.encode(
+        feature_texts,
+        normalize_embeddings=True
+    )
 
-faiss.normalize_L2(combined_embeddings)
+    combined_embeddings = alpha * overview_embeddings + beta * feature_embeddings
+    faiss.normalize_L2(combined_embeddings)
 
-dim = combined_embeddings.shape[1]
-index = faiss.IndexFlatIP(dim)
-index.add(combined_embeddings)
+    dim = combined_embeddings.shape[1]
+    index = faiss.IndexFlatIP(dim)
+    index.add(combined_embeddings)
+
+    print("✅ Model + Index fully loaded!")
 
 def vectorize(searched, top_k=50):
     query_text = f"Genres: {searched['genres']}. Director: {searched['director']}. Cast: {searched['cast']}."
