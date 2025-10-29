@@ -131,7 +131,7 @@ function ProfileSetup() {
       console.error("Fetch Error:", err);
     }
 
-    if (message == "added") {
+    if (!accExists) {
       navigate("/", {
         state: {
           username: user,
@@ -139,9 +139,8 @@ function ProfileSetup() {
           movies: favoriteMovies,
         },
       });
-    } else if (message == "updated") {
-      navigate("/home/profile");
     }
+    navigate("/home/profile");
   };
 
   const handleSkip = async () => {

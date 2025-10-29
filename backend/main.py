@@ -541,7 +541,6 @@ def logout():
             
 @app.route("/add_user_complete", methods=["POST", "GET"])
 def add_user_complete():
-    user = session.get("user")
     file = request.files.get('file')
     username = request.form.get('username')
     password_plain = request.form.get('password')
@@ -560,17 +559,17 @@ def add_user_complete():
     try:
         cur = conn.cursor()
         
-        # Check if user exists first
-        cur.execute("SELECT 1 FROM users WHERE username = %s", (username,))
-        exists = cur.fetchone() is not None
+        # # Check if user exists first
+        # cur.execute("SELECT 1 FROM users WHERE username = %s", (username,))
+        # exists = cur.fetchone() is not None
         
         cur.execute(
         'INSERT INTO users (password, username, fav_genres, fav_movies, profile_pic) VALUES (%s, %s, %s, %s, %s) ON CONFLICT (username) DO UPDATE SET fav_genres = EXCLUDED.fav_genres, fav_movies = EXCLUDED.fav_movies, profile_pic = EXCLUDED.profile_pic RETURNING xmax',
             (hashed.decode('utf-8'), username, json.dumps(genres_dict), json.dumps(movies_list), profile_pic_url)
         )
         
-        row = cur.fetchone()
-        message = "updated" if exists else "added"
+        # row = cur.fetchone()
+        message = "done"
         
         conn.commit()
         cur.close()
