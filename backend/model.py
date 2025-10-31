@@ -20,7 +20,7 @@ def load():
     movies = pd.DataFrame.from_dict(data, orient='index')
 
     # Load sentence transformer model once
-    model = SentenceTransformer('all-MiniLM-L6-v2')
+    model = SentenceTransformer('models/all-MiniLM-L6-v2')
     overview_embeddings = model.encode(
         movies["overview"].tolist(),
         normalize_embeddings=True
