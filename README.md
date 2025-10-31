@@ -42,7 +42,7 @@ It combines machine learning, full-stack web development, and scalable deploymen
 
 ```bash
 # Clone the repo
-git clone https://github.com/yourusername/popcorn-pick.git
+git clone https://github.com/talinbansal/ML-Project.git
 cd popcorn-pick
 
 # Backend setup
@@ -51,6 +51,6 @@ pip install -r requirements.txt
 flask run
 
 # Frontend setup
-cd ../frontend
+cd my-app
 npm install
 npm start
