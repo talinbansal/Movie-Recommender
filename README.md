@@ -43,7 +43,7 @@ It combines machine learning, full-stack web development, and scalable deploymen
 ```bash
 # Clone the repo
 git clone https://github.com/talinbansal/ML-Project.git
-cd popcorn-pick
+cd ML-Project
 
 # Backend setup
 cd backend
