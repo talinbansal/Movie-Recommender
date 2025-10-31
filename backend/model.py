@@ -42,7 +42,7 @@ def load():
     index = faiss.IndexFlatIP(dim)
     index.add(combined_embeddings)
 
-    print("✅ Model + Index fully loaded!")
+    print("Model + Index fully loaded!")
 
 def vectorize(searched, top_k=50):
     query_text = f"Genres: {searched['genres']}. Director: {searched['director']}. Cast: {searched['cast']}."
