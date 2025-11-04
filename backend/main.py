@@ -13,7 +13,6 @@ from flask_cors import CORS
 from db import conn, s3, BUCKET
 import logging
 import model
-import threading
 logging.basicConfig(level=logging.DEBUG)
 
 import pandas as pd
@@ -21,17 +20,6 @@ import pandas as pd
 ## Flask App Initialization
 app = Flask(__name__, instance_relative_config=True)
 CORS(app, supports_credentials=True)  #origins=["http://localhost:5173"]
-
-model_loaded = False
-
-def load_model():
-    global model_loaded
-    model.load()  # ✅ correct load function call
-    model_loaded = True
-    logging.info("✅ Model loaded!")
-
-# Start loading in the background
-threading.Thread(target=load_model, daemon=True).start()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 
