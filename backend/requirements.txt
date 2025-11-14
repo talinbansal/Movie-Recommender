@@ -1,6 +1,7 @@
 fastapi
 uvicorn
 requests
+werkzeug>=2.3.0
 gunicorn
 pandas
 faiss-cpu
