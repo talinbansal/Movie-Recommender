@@ -24,7 +24,7 @@ import pandas as pd
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],          # <-- any domain can access
+    allow_origins=["https://www.popcornpick.app"],          # <-- any domain can access
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
