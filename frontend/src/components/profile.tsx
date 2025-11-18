@@ -93,6 +93,7 @@ function Profile() {
     navigate("/setup_profile", {
       state: {
         accExists: true,
+        profilePic: profilePic,
         genres: userGenres,
         movies: userMovies,
         username: username,

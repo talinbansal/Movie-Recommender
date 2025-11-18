@@ -20,8 +20,13 @@ function Log() {
 
   const checkLogin = async ({ username, password }: loginProps) => {
     try {
-      const url = `https://api.popcornpick.app/search_user?username=${username}&password=${password}`;
-      const response = await fetch(url, { credentials: "include" });
+      const url = "https://api.popcornpick.app/search_user";
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ username, password }),
+      });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -126,8 +131,12 @@ function Create() {
       return;
     }
     try {
-      const url = `https://api.popcornpick.app/add_user?username=${username}&password=${password}&setup=${false}`;
-      const response = await fetch(url);
+      const url = "https://api.popcornpick.app/check_user";
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username }),
+      });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

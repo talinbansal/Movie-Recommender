@@ -15,6 +15,7 @@ function ProfileSetup() {
   const accExists = location.state?.accExists;
   const userGenres = location.state?.genres;
   const userMovies = location.state?.movies;
+  const userProfilePic = location.state?.profilePic;
   const [step, setStep] = useState(1);
   const [loadedGenres, setLoadedGenres] = useState({});
   const [selectedGenres, setSelectedGenres] = useState<{
@@ -62,6 +63,7 @@ function ProfileSetup() {
     if (accExists) {
       setSelectedGenres(userGenres);
       setFavoriteMovies(userMovies);
+      setProfilePic(userProfilePic);
     }
   }, []);
 
@@ -111,15 +113,19 @@ function ProfileSetup() {
   const handleSetUp = async () => {
     try {
       const formData = new FormData();
-      formData.append("file", selectedFile as Blob);
-      formData.append("username", user);
-      formData.append("password", pass);
-      formData.append("setup", "true");
+      if (userProfilePic != profilePic && selectedFile)
+        formData.append("file", selectedFile as Blob);
+      if (user) formData.append("username", user);
+      if (pass) formData.append("password", pass);
       formData.append("genres", JSON.stringify(selectedGenres));
       formData.append("movies", JSON.stringify(favoriteMovies));
 
-      const url = `https://api.popcornpick.app/add_user_complete`;
-      const response = await fetch(url, { method: "POST", body: formData });
+      const url = "https://api.popcornpick.app/add_user_complete";
+      const response = await fetch(url, {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -145,10 +151,18 @@ function ProfileSetup() {
 
   const handleSkip = async () => {
     try {
-      const url = `https://api.popcornpick.app/add_user?username=${user}&password=${pass}&setup=${true}&genres=${encodeURIComponent(
-        JSON.stringify(selectedGenres)
-      )}&movies=${encodeURIComponent(JSON.stringify(favoriteMovies))}`;
-      const response = await fetch(url);
+      const url = "https://api.popcornpick.app/add_user";
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: user,
+          password: pass,
+          setup: true,
+          genres: JSON.stringify(selectedGenres),
+          movies: JSON.stringify(favoriteMovies),
+        }),
+      });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -173,10 +187,17 @@ function ProfileSetup() {
 
   const handleSkipExists = async () => {
     try {
-      const url = `https://api.popcornpick.app/add_user?username=${user}&setup=exists&genres=${encodeURIComponent(
-        JSON.stringify(selectedGenres)
-      )}&movies=${encodeURIComponent(JSON.stringify(favoriteMovies))}`;
-      const response = await fetch(url);
+      const url = "https://api.popcornpick.app/add_user";
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: user,
+          setup: "exists",
+          genres: JSON.stringify(selectedGenres),
+          movies: JSON.stringify(favoriteMovies),
+        }),
+      });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

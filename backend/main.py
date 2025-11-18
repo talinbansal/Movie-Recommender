@@ -546,10 +546,16 @@ async def fetch_movies(request: Request):
     finally:
         if 'cur' in locals() and not cur.closed:
             cur.close()
+            
+class SearchUserBody(BaseModel):
+    username: str
+    password: str
     
 ## Users Table Endpoints
 @app.post("/search_user")
-async def search_user(request: Request, password: str = Query(...), username: str = Query(...)):
+async def search_user(request: Request, body: SearchUserBody):
+    username = body.username
+    password = body.password
     
     try: 
         cur = conn.cursor()
@@ -602,33 +608,46 @@ async def logout(request: Request):
     return response
             
 @app.post("/add_user_complete")
-async def add_user_complete(file: UploadFile = File(...),
-    username: str = Form(...),
-    password: str = Form(None),
-    genres: str = Form(None),
-    movies: str = Form(None)
+async def add_user_complete(file: UploadFile | None = File(None),
+    username: str | None = Form(None),
+    password: str | None = Form(None),
+    genres: str = Form(...),
+    movies: str = Form(...)
 ):
     
     genres_dict = json.loads(genres) if genres else []
     movies_list = json.loads(movies) if movies else []
     
-    hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+    hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()) if password else None
     
-    filename = secure_filename(file.filename)
-    s3_key = f"profile_pics/{username}/{filename}"
-    s3.upload_fileobj(file.file, BUCKET, s3_key)
-    profile_pic_url = f"https://{BUCKET}.s3.amazonaws.com/{s3_key}"
+    profile_pic_url = None
+    
+    if file:
+        filename = secure_filename(file.filename)
+        s3_key = f"profile_pics/{username}/{filename}"
+        s3.upload_fileobj(file.file, BUCKET, s3_key)
+        profile_pic_url = f"https://{BUCKET}.s3.amazonaws.com/{s3_key}"
     
     try:
         cur = conn.cursor()
         
-        cur.execute(
-        'INSERT INTO users (password, username, fav_genres, fav_movies, profile_pic) VALUES (%s, %s, %s, %s, %s) ON CONFLICT (username) DO UPDATE SET fav_genres = EXCLUDED.fav_genres, fav_movies = EXCLUDED.fav_movies, profile_pic = EXCLUDED.profile_pic RETURNING xmax',
-            (hashed.decode('utf-8'), username, json.dumps(genres_dict), json.dumps(movies_list), profile_pic_url)
-        )
-        
-        message = "done"
-        
+        if hashed:
+            cur.execute(
+            'INSERT INTO users (password, username, fav_genres, fav_movies, profile_pic) VALUES (%s, %s, %s, %s, %s)',
+                (hashed.decode('utf-8'), username, json.dumps(genres_dict), json.dumps(movies_list), profile_pic_url)
+            )
+        else:
+            if file and profile_pic_url:
+                cur.execute(
+                'UPDATE users SET fav_genres= %s, fav_movies= %s, profile_pic= %s WHERE username= %s',
+                    (json.dumps(genres_dict), json.dumps(movies_list), profile_pic_url, username)
+                )
+            else:
+                cur.execute(
+                'UPDATE users SET fav_genres= %s, fav_movies= %s WHERE username= %s',
+                    (json.dumps(genres_dict), json.dumps(movies_list), username)
+                )
+            
         conn.commit()
         cur.close()
 
@@ -641,37 +660,59 @@ async def add_user_complete(file: UploadFile = File(...),
     finally:
         if 'cur' in locals() and not cur.closed:
             cur.close()
+
+class UserCheckBody(BaseModel):
+    username: str
+            
+@app.post("/check_user")
+async def check_user(body: UserCheckBody):
+    username = body.username
+    try:
+        cur = conn.cursor()
+        
+        cur.execute(
+            'SELECT * FROM users WHERE username = %s',
+            (username, ) # hashed.decode('utf-8'), username
+        )
+        
+        row = cur.fetchone()
+        
+        if row:
+            message = "User already exists"
+        else:
+            message = "New user"
+
+        conn.commit()
+        cur.close()
+    except Exception as e:
+        logging.error(f"Error during user search: {e}")
+        conn.rollback()
+        raise HTTPException(status_code=500, detail="Database error")
+    finally:
+        if 'cur' in locals() and not cur.closed:
+            cur.close()
+            
+class AddUserBody(BaseModel):
+    setup: bool | str   
+    username: str
+    password: str | None = None
+    genres: str | None = None
+    movies: str | None = None
+
         
 @app.post("/add_user")
-async def add_user(setup: str = Query(...), username: str = Query(...), 
-    password: str | None = Query(None),
-    genres: str | None = Query(None),
-    movies: str | None = Query(None),
-):
+async def add_user(body: AddUserBody):
+    setup = body.setup
+    username = body.username
+    password = body.password
+    genres = body.genres
+    movies = body.movies
+    
     if setup != "exists":
         hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
     
     try:
-        if setup == "false":
-            cur = conn.cursor()
-            
-            cur.execute(
-                'SELECT * FROM users WHERE username = %s',
-                (username, ) # hashed.decode('utf-8'), username
-            )
-            
-            row = cur.fetchone()
-            
-            if row:
-                message = "User already exists"
-            else:
-                message = "New user"
-
-            conn.commit()
-            cur.close()
-
-            return {"message": message}
-        elif setup == "exists":
+        if setup == "exists":
             genres_dict = json.loads(genres) if genres else {}
             movies_list = json.loads(movies) if movies else []
             
