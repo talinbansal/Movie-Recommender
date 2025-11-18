@@ -107,7 +107,8 @@ async def recommend(title: str = Query(..., description="Movie title to get reco
 ## API Endpoint for api.tsx & movie.tsx
 @app.get('/search_recommended')
 async def search_api(movies: list[str] = Query(..., description="List of movie titles")):
-    return {"details": details(movies)}
+    result = await details(movies)
+    return {"details": result}
 
 async def details(movies):
     movie_details = []
@@ -253,10 +254,9 @@ async def load_genres(request: Request):
         
     genres = response.json()
     
+    genre_ids = {}
     for genre in genres.get("genres", []):
-        genre_ids = {
-            genre["name"]: genre["id"]
-        }
+        genre_ids[genre["name"]] = genre["id"]
     return {"genres": genre_ids, "user": username}
 
 @app.get("/genre_sort")
