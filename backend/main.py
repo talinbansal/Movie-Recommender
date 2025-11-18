@@ -579,7 +579,6 @@ async def search_user(body: SearchUserBody, request: Request):
         password_bytes = password.encode('utf-8')
         
         if bcrypt.checkpw(password_bytes, stored_hash):
-            request.session.permanent = True
             request.session["user_id"] = user
             request.session["user"] = username
             response = {"exists": True, "user": username}
