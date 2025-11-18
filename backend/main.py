@@ -16,6 +16,7 @@ from starlette.middleware.sessions  import SessionMiddleware
 import uvicorn
 import httpx
 import asyncio
+from pydantic import BaseModel
 logging.basicConfig(level=logging.DEBUG)
 
 import pandas as pd
