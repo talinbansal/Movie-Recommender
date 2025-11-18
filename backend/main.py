@@ -554,7 +554,7 @@ class SearchUserBody(BaseModel):
     
 ## Users Table Endpoints
 @app.post("/search_user")
-async def search_user(body: SearchUserBody):
+async def search_user(body: SearchUserBody, request: Request):
     username = body.username
     password = body.password
     
