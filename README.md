@@ -27,7 +27,7 @@ It combines machine learning, full-stack web development, and scalable deploymen
 - Tailwind CSS  
 
 **Backend:**  
-- Python (Flask)  
+- Python (FastAPI)  
 - FAISS  
 - Sentence Transformers (`all-MiniLM-L6-v2`)  
 - PostgreSQL  
