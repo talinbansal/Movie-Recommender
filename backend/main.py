@@ -788,6 +788,7 @@ async def delete_user(request: Request):
 
 
 @app.post("/update_comments")
+@app.get("/update_comments")
 async def update_comments(request: Request, comment: str = Query(...), movie_id: str = Query(...)):
     user = request.session.get("user")
     current_time = datetime.now().strftime("%d-%m-%Y")
