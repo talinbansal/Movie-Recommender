@@ -858,6 +858,7 @@ async def fetch_rating(request: Request, movie_id: str = Query(...)):
         if 'cur' in locals() and not cur.closed:
             cur.close()
 
+@app.get("/update_user_rating")
 @app.post("/update_user_rating")
 async def update_user_rating(request: Request, movie_id: str = Query(...), rating: float = Query(...)):
     user = request.session.get("user_id")
