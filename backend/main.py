@@ -231,12 +231,11 @@ async def get_latest_releases():
     data = response.json()
     movies = data.get("results")
     
+    movie_info = {}
     for movie in movies:
-        movie_info = {
-        "id": movie.get("id"),
-        "title": movie.get("title"),
-        "backdrop_path":movie.get("backdrop_path")
-    }
+        movie_info["id"] = movie.get("id"),
+        movie_info["title"] = movie.get("title"),
+        movie_info["backdrop_path"] = movie.get("backdrop_path")
         
     movie_details.append(movie_info)    
     return {"latest": movie_details}
