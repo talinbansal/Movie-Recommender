@@ -27,6 +27,7 @@ function API({ recs }: APIProps) {
   const { searched } = useParams();
   const initialMessage = "Looking for similar movies...";
   const [loadingMessage, setLoadingMessage] = useState(initialMessage);
+  const [problemMsg, setProblemMsg] = useState("");
 
   useEffect(() => {
     let timer: number;
@@ -68,7 +69,9 @@ function API({ recs }: APIProps) {
     }
   };
 
-  const problemMsg = recs.length === 0 ? "Please Re-enter movie name" : "";
+  setTimeout(() => {
+    setProblemMsg(recs.length === 0 ? "Please Re-enter movie name" : "");
+  }, 1000);
 
   useEffect(() => {
     if (recs.length > 1) {
