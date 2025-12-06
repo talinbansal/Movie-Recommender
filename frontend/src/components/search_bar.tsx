@@ -3,18 +3,15 @@ import { useNavigate } from "react-router";
 
 interface SearchProps {
   setRecs: React.Dispatch<React.SetStateAction<string[]>>;
-  setSearched: React.Dispatch<React.SetStateAction<string>>;
-  searched: string;
   recs: string[];
 }
 
-function Search({ setRecs, setSearched, searched }: SearchProps) {
+function Search({ setRecs }: SearchProps) {
   const [movie, setMovie] = useState("");
   const navigate = useNavigate();
 
   //  API request (rewrite)
   const getRecommendations = async (movie: string) => {
-    setSearched(movie);
     try {
       const url = `https://api.popcornpick.app/recommend?title=${movie}`;
       const response = await fetch(url);
@@ -45,8 +42,8 @@ function Search({ setRecs, setSearched, searched }: SearchProps) {
           onKeyDown={(e) => {
             console.log("Key pressed:", e.key); // 👀 check actual key
             if (e.key === "Enter") {
-              navigate(`/home/search/${searched}`);
               setRecs([]);
+              navigate(`/home/search/${movie}`);
               getRecommendations(movie);
             }
           }}

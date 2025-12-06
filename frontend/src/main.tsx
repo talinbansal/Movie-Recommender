@@ -14,7 +14,6 @@ import "./index.css";
 
 function RootWrapper() {
   const [recs, setRecs] = useState<string[]>([]);
-  const [searched, setSearched] = useState("");
 
   return (
     <BrowserRouter>
@@ -26,12 +25,7 @@ function RootWrapper() {
           path="home/*"
           element={
             <ProtectedRoute>
-              <App
-                recs={recs}
-                setRecs={setRecs}
-                searched={searched}
-                setSearched={setSearched}
-              />
+              <App recs={recs} setRecs={setRecs} />
             </ProtectedRoute>
           }
         />

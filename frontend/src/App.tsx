@@ -16,19 +16,12 @@ import "./components/api.css";
 interface AppProps {
   recs: string[];
   setRecs: React.Dispatch<React.SetStateAction<string[]>>;
-  searched: string;
-  setSearched: React.Dispatch<React.SetStateAction<string>>;
 }
 
-function App({ recs, setRecs, searched, setSearched }: AppProps) {
+function App({ recs, setRecs }: AppProps) {
   return (
     <div className="bg-black">
-      <Search
-        recs={recs}
-        searched={searched}
-        setRecs={setRecs}
-        setSearched={setSearched}
-      />
+      <Search recs={recs} setRecs={setRecs} />
       <NavBar setRecs={setRecs} />
       <Routes>
         <Route index element={<Info />} />
