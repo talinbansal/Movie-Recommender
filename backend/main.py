@@ -664,6 +664,7 @@ class UserCheckBody(BaseModel):
     username: str
             
 @app.post("/check_user")
+@app.get("/check_user")
 async def check_user(body: UserCheckBody):
     username = body.username
     try:
@@ -683,6 +684,8 @@ async def check_user(body: UserCheckBody):
 
         conn.commit()
         cur.close()
+        
+        return {message: message}
     except Exception as e:
         logging.error(f"Error during user search: {e}")
         conn.rollback()

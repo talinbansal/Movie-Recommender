@@ -92,9 +92,10 @@ function API({ recs }: APIProps) {
   return (
     <div className="container">
       {detailsList.length === 0 ? (
-        <p className="text-center bg-black text-gray-400 mt-4">
-          {loadingMessage}
-        </p>
+        <div className="text-center bg-black text-gray-400 mt-4 flex flex-col items-center">
+          <div className="w-7 h-7 border-4 border-gray-600 border-t-white rounded-full animate-spin"></div>
+          <p className="mt-2">{loadingMessage}</p>
+        </div>
       ) : (
         detailsList.map((movie, index) => (
           <div
