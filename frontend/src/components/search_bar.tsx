@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router";
 
 interface SearchProps {
@@ -8,7 +8,7 @@ interface SearchProps {
   recs: string[];
 }
 
-function Search({ setRecs, setSearched, searched, recs }: SearchProps) {
+function Search({ setRecs, setSearched, searched }: SearchProps) {
   const [movie, setMovie] = useState("");
   const navigate = useNavigate();
 
@@ -31,12 +31,6 @@ function Search({ setRecs, setSearched, searched, recs }: SearchProps) {
     }
   };
 
-  useEffect(() => {
-    if (recs.length > 1) {
-      navigate(`/home/search/${searched}`);
-    }
-  }, [recs]);
-
   return (
     <>
       <div className="search-container">
@@ -51,6 +45,7 @@ function Search({ setRecs, setSearched, searched, recs }: SearchProps) {
           onKeyDown={(e) => {
             console.log("Key pressed:", e.key); // 👀 check actual key
             if (e.key === "Enter") {
+              navigate(`/home/search/${searched}`);
               setRecs([]);
               getRecommendations(movie);
             }

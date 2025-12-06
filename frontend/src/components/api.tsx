@@ -25,7 +25,7 @@ function API({ recs }: APIProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { searched } = useParams();
-  const initialMessage = "Fetching similar movies...";
+  const initialMessage = "Looking for similar movies...";
   const [loadingMessage, setLoadingMessage] = useState(initialMessage);
 
   useEffect(() => {
@@ -37,7 +37,7 @@ function API({ recs }: APIProps) {
 
       // After 4 seconds, update the message
       timer = setTimeout(() => {
-        setLoadingMessage("Sorry, I'm looking for the best ones");
+        setLoadingMessage("Get some Popcorn while I search");
       }, 4000);
 
       timer = setTimeout(() => {
@@ -63,11 +63,12 @@ function API({ recs }: APIProps) {
 
       const data = await response.json();
       setDetailsList(data.details);
-      // console.log(data.details);
     } catch (err) {
       console.error("Fetch error: ", err);
     }
   };
+
+  const problemMsg = recs.length === 0 ? "Please Re-enter movie name" : "";
 
   useEffect(() => {
     if (recs.length > 1) {
@@ -78,12 +79,10 @@ function API({ recs }: APIProps) {
   }, [recs]);
 
   useEffect(() => {
-    console.log(recs);
     posters();
   }, []);
 
   const handleClick = ({ title, id }: handleClickProps) => {
-    // console.log(title, id);
     navigate(`/home/movie/${id}`, {
       state: { from: location.pathname, title, id, searched },
     });
@@ -91,6 +90,11 @@ function API({ recs }: APIProps) {
 
   return (
     <div className="container">
+      {recs.length == 0 && problemMsg && (
+        <div className="text-center bg-black text-gray-400 mt-4 flex flex-col items-center">
+          <p className="mt-2">{problemMsg}</p>
+        </div>
+      )}
       {detailsList.length === 0 ? (
         <div className="text-center bg-black text-gray-400 mt-4 flex flex-col items-center">
           <div className="w-7 h-7 border-4 border-gray-600 border-t-white rounded-full animate-spin"></div>
