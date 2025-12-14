@@ -49,7 +49,7 @@ function Movie() {
   useEffect(() => {
     // console.log("Movies Page Loaded");
     getTitle();
-  }, []);
+  }, [id]);
 
   useEffect(() => {
     if (title != "") {
@@ -239,7 +239,7 @@ function Movie() {
   useEffect(() => {
     fetchComments();
     fetchRating();
-  }, []);
+  }, [id]);
 
   // Handle posting a new comment
   const handlePostComment = () => {
