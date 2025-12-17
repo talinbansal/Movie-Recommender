@@ -711,7 +711,7 @@ async def check_user(body: UserCheckBody):
     cur = None
     
     try:
-        con = get_conn()
+        conn = get_conn()
         cur = conn.cursor()
         
         cur.execute(
