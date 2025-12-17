@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from datetime import timedelta
 import bcrypt
 import requests 
-from db import conn, s3, BUCKET
+from db import get_conn, s3, BUCKET
 import logging
 import model
 from fastapi import FastAPI, Query, HTTPException, Request, APIRouter, UploadFile, File, Form
@@ -387,8 +387,11 @@ async def more_top_rated(page_num: int = Query(1, description="Page number")):
 @app.get("/get_user_data")
 async def user_data(request: Request):
     user = request.session.get("user")
+    conn = None
+    cur = None
     
     try:
+        conn = get_conn() 
         cur = conn.cursor()
         
         cur.execute(
@@ -400,22 +403,27 @@ async def user_data(request: Request):
         movies_list = row[1]
         
         conn.commit()
-        cur.close()
         
         return {"user_data": [genres_list, movies_list]}
     except Exception as e:
         logging.error(f"Error during user search: {e}")
-        conn.rollback()
+        if conn and not conn.closed:
+            conn.rollback()
         raise HTTPException(status_code=500, detail="Database error")
     finally:
-        if 'cur' in locals() and not cur.closed:
+        if cur and not cur.closed:
             cur.close()
+        if conn and not conn.closed:
+            conn.close()
         
 @app.get("/get_user_stats")
 async def user_stats(request: Request):
     user_id = request.session.get("user_id")
+    conn = None
+    cur = None
     
     try:
+        conn = get_conn()
         cur = conn.cursor()
         
         cur.execute(
@@ -435,24 +443,28 @@ async def user_stats(request: Request):
         max_rated_movie = await id_to_title(max_rated_movie_id) if max_rating > 0 else ""
         
         conn.commit()
-        cur.close()
         
         return {"user_stats": [num_ratings, [max_rated_movie, max_rating]]}
     except Exception as e:
         logging.error(f"Error during user search: {e}")
-        conn.rollback()
+        if conn and not conn.closed:
+            conn.rollback()
         raise HTTPException(status_code=500, detail="Database error")
-
     finally:
-        if 'cur' in locals() and not cur.closed:
+        if cur and not cur.closed:
             cur.close()
+        if conn and not conn.closed:
+            conn.close()
         
 @app.get("/add_to_watchlist")
 @app.post("/add_to_watchlist")
 def add_to_watchlist(request: Request, title: str = Query(...), poster_path: str = Query(...), genres: str = Query(...), id: str = Query(...)):
     user = request.session.get("user_id")
+    conn = None
+    cur = None
     
     try:
+        conn = get_conn()
         cur = conn.cursor()
         
         cur.execute(
@@ -461,23 +473,28 @@ def add_to_watchlist(request: Request, title: str = Query(...), poster_path: str
         )
         
         conn.commit()
-        cur.close()
         
         return {"message": "added"}
     except Exception as e:
         logging.error(f"Error during user search: {e}")
-        conn.rollback()
+        if conn and not conn.closed:
+            conn.rollback()
         raise HTTPException(status_code=500, detail="Database error")
     finally:
-        if 'cur' in locals() and not cur.closed:
+        if cur and not cur.closed:
             cur.close()
+        if conn and not conn.closed:
+            conn.close()
 
 @app.get("/remove_from_watchlist")
 @app.post("/remove_from_watchlist")
 async def remove_from_watchlist(request: Request, title: str = Query(...), poster_path: str = Query(...), genres: str = Query(...)):
     user = request.session.get("user_id")
+    conn = None
+    cur = None
     
     try:
+        conn = get_conn()
         cur = conn.cursor()
         
         cur.execute(
@@ -486,23 +503,28 @@ async def remove_from_watchlist(request: Request, title: str = Query(...), poste
         )
         
         conn.commit()
-        cur.close()
         
         return {"message": "removed"}
     except Exception as e:
         logging.error(f"Error during user search: {e}")
-        conn.rollback()
+        if conn and not conn.closed:
+            conn.rollback()
         raise HTTPException(status_code=500, detail="Database error")
     finally:
-        if 'cur' in locals() and not cur.closed:
+        if cur and not cur.closed:
             cur.close()
+        if conn and not conn.closed:
+            conn.close()
 
 
 @app.get("/check_watchlist")
 async def check_watchlist(request: Request, poster_path: str = Query(...)):
     user = request.session.get("user_id")
+    conn = None
+    cur = None
     
     try:
+        conn = get_conn()
         cur = conn.cursor()
         
         cur.execute(
@@ -513,39 +535,46 @@ async def check_watchlist(request: Request, poster_path: str = Query(...)):
         conn.commit()
         
         result = cur.fetchone()[0]
-        cur.close()
         
         return {"exists": result}
     except Exception as e:
         logging.error(f"Error during user search: {e}")
-        conn.rollback()
+        if conn and not conn.closed:
+            conn.rollback()
         raise HTTPException(status_code=500, detail="Database error")
     finally:
-        if 'cur' in locals() and not cur.closed:
+        if cur and not cur.closed:
             cur.close()
-
+        if conn and not conn.closed:
+            conn.close()
+            
 @app.get("/get_watchlist")
 async def fetch_movies(request: Request):
     user = request.session.get("user_id")
+    conn = None
+    cur = None
     
     try:
+        conn = get_conn()
         cur = conn.cursor()
         
         cur.execute("SELECT * FROM watchlist WHERE user_id=%s", (user,))
         
         rows = cur.fetchall()
-        cur.close()
         
         watchlist = [{"title": row[1], "poster_path": row[2], "genres": row[3], "id": row[4]} for row in rows]
         
         return {"watchlist": watchlist}
     except Exception as e:
         logging.error(f"Error during user search: {e}")
-        conn.rollback()
+        if conn and not conn.closed:        
+            conn.rollback()
         raise HTTPException(status_code=500, detail="Database error")
     finally:
-        if 'cur' in locals() and not cur.closed:
+        if cur and not cur.closed:
             cur.close()
+        if conn and not conn.closed:
+            conn.close()
             
 class SearchUserBody(BaseModel):
     username: str
@@ -556,8 +585,11 @@ class SearchUserBody(BaseModel):
 async def search_user(body: SearchUserBody, request: Request):
     username = body.username
     password = body.password
+    conn = None
+    cur = None
     
     try: 
+        conn = get_conn()
         cur = conn.cursor()
         
         cur.execute(
@@ -568,7 +600,6 @@ async def search_user(body: SearchUserBody, request: Request):
         conn.commit()
         
         row = cur.fetchone()
-        cur.close()
         
         if row is None:
             return {"exists": False}
@@ -587,11 +618,14 @@ async def search_user(body: SearchUserBody, request: Request):
             return {"exists": False}
     except Exception as e:
         logging.error(f"Error during user search: {e}")
-        conn.rollback()
+        if conn and not conn.closed:        
+            conn.rollback()
         raise HTTPException(status_code=500, detail="Database error")
     finally:
-        if 'cur' in locals() and not cur.closed:
+        if cur and not cur.closed:
             cur.close()
+        if conn and not conn.closed:
+            conn.close()
             
 @app.get("/logout")
 @app.post("/logout")
@@ -626,8 +660,12 @@ async def add_user_complete(file: UploadFile | None = File(None),
         s3_key = f"profile_pics/{username}/{filename}"
         s3.upload_fileobj(file.file, BUCKET, s3_key)
         profile_pic_url = f"https://{BUCKET}.s3.amazonaws.com/{s3_key}"
+        
+    conn = None
+    cur = None
     
     try:
+        conn = get_conn()
         cur = conn.cursor()
         
         if hashed:
@@ -648,17 +686,19 @@ async def add_user_complete(file: UploadFile | None = File(None),
                 )
             
         conn.commit()
-        cur.close()
 
         return JSONResponse({"message": "done"}, status_code=200)
     
     except Exception as e:
         logging.error(f"Error during user search: {e}")
-        conn.rollback()
+        if conn and not conn.closed:
+            conn.rollback()
         raise HTTPException(status_code=500, detail="Database error")
     finally:
-        if 'cur' in locals() and not cur.closed:
+        if cur and not cur.closed:
             cur.close()
+        if conn and not conn.closed:
+            conn.close()
 
 class UserCheckBody(BaseModel):
     username: str
@@ -667,7 +707,11 @@ class UserCheckBody(BaseModel):
 @app.get("/check_user")
 async def check_user(body: UserCheckBody):
     username = body.username
+    conn = None
+    cur = None
+    
     try:
+        con = get_conn()
         cur = conn.cursor()
         
         cur.execute(
@@ -683,16 +727,18 @@ async def check_user(body: UserCheckBody):
             message = "New user"
 
         conn.commit()
-        cur.close()
         
         return {"message": message}
     except Exception as e:
         logging.error(f"Error during user search: {e}")
-        conn.rollback()
+        if conn and not conn.closed:
+            conn.rollback()
         raise HTTPException(status_code=500, detail="Database error")
     finally:
-        if 'cur' in locals() and not cur.closed:
+        if cur and not cur.closed:
             cur.close()
+        if conn and not conn.closed:
+            conn.close()
             
 class AddUserBody(BaseModel):
     setup: bool | str   
@@ -712,12 +758,16 @@ async def add_user(body: AddUserBody):
     
     if setup != "exists":
         hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        
+    conn = None
+    cur = None
     
     try:
         if setup == "exists":
             genres_dict = json.loads(genres) if genres else {}
             movies_list = json.loads(movies) if movies else []
             
+            conn = get_conn()
             cur = conn.cursor()
             
             cur.execute(
@@ -728,13 +778,13 @@ async def add_user(body: AddUserBody):
             message = "updated"
 
             conn.commit()
-            cur.close()
 
             return {"message": message}
         else:
             genres_dict = json.loads(genres) if genres else {}
             movies_list = json.loads(movies) if movies else []
             
+            conn = get_conn()
             cur = conn.cursor()
             
             cur.execute(
@@ -745,22 +795,28 @@ async def add_user(body: AddUserBody):
             message = "added"
 
             conn.commit()
-            cur.close()
 
             return {"message": message}
             
     except Exception as e:
         logging.error(f"Error during user search: {e}")
-        conn.rollback()
+        if conn and not conn.closed:
+            conn.rollback()
         raise HTTPException(status_code=500, detail="Database error")
     finally:
-        if 'cur' in locals() and not cur.closed:
+        if cur and not cur.closed:
             cur.close()
+        if conn and not conn.closed:
+            conn.close()
             
 @app.delete("/delete_user")
 async def delete_user(request: Request):
     user = request.session.get("user")
+    conn = None
+    cur = None
+    
     try: 
+        conn = get_conn()
         cur = conn.cursor()
         
         cur.execute(
@@ -782,11 +838,14 @@ async def delete_user(request: Request):
         return {"message": "deleted"}
     except Exception as e:
         logging.error(f"Error deleting user: {e}")
-        conn.rollback()
+        if conn and not conn.closed:
+            conn.rollback()
         raise HTTPException(status_code=500, detail="Database error")
     finally:
-        if 'cur' in locals() and not cur.closed:
+        if cur and not cur.closed:
             cur.close()
+        if conn and not conn.closed:
+            conn.close()
 
 
 @app.post("/update_comments")
@@ -794,35 +853,42 @@ async def delete_user(request: Request):
 async def update_comments(request: Request, comment: str = Query(...), movie_id: str = Query(...)):
     user = request.session.get("user")
     current_time = datetime.now().strftime("%d-%m-%Y")
+    conn = None
+    cur = None
     
     try:
+        conn = get_conn()
         cur = conn.cursor()
         
         cur.execute("INSERT INTO comments (username, comment_text, created_at, movie_id) VALUES (%s, %s, %s, %s)", (user, comment, current_time, movie_id))
         
         conn.commit()
-        cur.close()
         
         return {"message": "added"}
     except Exception as e:
         logging.error(f"Error during user search: {e}")
-        conn.rollback()
+        if conn and not conn.closed:
+            conn.rollback()
         raise HTTPException(status_code=500, detail="Database error")
     finally:
-        if 'cur' in locals() and not cur.closed:
+        if cur and not cur.closed:
             cur.close()
+        if conn and not conn.closed:
+            conn.close()
 
 @app.get("/fetch_comments")
 async def fetch_comments(request: Request, movie_id: str = Query(...)):
     user = request.session.get("user")
+    conn = None
+    cur = None
     
     try:
+        conn = get_conn()
         cur = conn.cursor()
         
         cur.execute("SELECT * FROM comments WHERE movie_id=%s ORDER BY created_at DESC", (movie_id,))
         
         rows = cur.fetchall()
-        cur.close()
         
         if rows:
             comments = [{"username": row[1], "comment_text": row[2], "created_at": row[3]} for row in rows]
@@ -830,17 +896,23 @@ async def fetch_comments(request: Request, movie_id: str = Query(...)):
         return {"comments": [], "user": user}
     except Exception as e:
         logging.error(f"Error during user search: {e}")
-        conn.rollback()
+        if conn and not conn.closed:
+            conn.rollback()
         raise HTTPException(status_code=500, detail="Database error")
     finally:
-        if 'cur' in locals() and not cur.closed:
+        if cur and not cur.closed:
             cur.close()
+        if conn and not conn.closed:
+            conn.close()
 
 @app.get("/fetch_rating")
 async def fetch_rating(request: Request, movie_id: str = Query(...)):
     user = request.session.get("user_id")
+    conn = None
+    cur = None
     
     try:
+        conn = get_conn()
         cur = conn.cursor()
         
         cur.execute("SELECT rating FROM ratings WHERE user_id=%s AND movie_id=%s", (str(user), movie_id))
@@ -848,47 +920,57 @@ async def fetch_rating(request: Request, movie_id: str = Query(...)):
         
         cur.execute("SELECT avg_rating FROM avg_ratings WHERE movie_id=%s", (movie_id,))
         row2 = cur.fetchone()
-        cur.close()
         
         if row:
             return {"rating": row[0], "avg_rating": row2[0]}
         return {"rating": 0, "avg_rating": row2[0] if row2 else 0}
     except Exception as e:
         logging.error(f"Error during user search: {e}")
-        conn.rollback()
+        if conn and not conn.closed:
+            conn.rollback()
         raise HTTPException(status_code=500, detail="Database error")
     finally:
-        if 'cur' in locals() and not cur.closed:
+        if cur and not cur.closed:
             cur.close()
+        if conn and not conn.closed:
+            conn.close()
 
 @app.get("/update_user_rating")
 @app.post("/update_user_rating")
 async def update_user_rating(request: Request, movie_id: str = Query(...), rating: float = Query(...)):
     user = request.session.get("user_id")
+    conn = None
+    cur = None
     
     try:
+        conn = get_conn()
         cur = conn.cursor()
         
         cur.execute("INSERT INTO ratings (user_id, movie_id, rating) VALUES (%s, %s, %s) ON CONFLICT (user_id, movie_id) DO UPDATE SET rating = EXCLUDED.rating", (user, movie_id, rating))
         
         conn.commit()
-        cur.close()
         
         return {"message": "rating updated"}
     except Exception as e:
         logging.error(f"Error during user search: {e}")
-        conn.rollback()
+        if conn and not conn.closed:
+            conn.rollback()
         raise HTTPException(status_code=500, detail="Database error")
     finally:
-        if 'cur' in locals() and not cur.closed:
+        if cur and not cur.closed:
             cur.close()
+        if conn and not conn.closed:
+            conn.close()
 
 @app.get("/update_avg_rating")
 async def update_avg_rating(movie_id: str = Query(...)):
     ratings_sum = 0
     total_ratings = 0
+    conn = None
+    cur = None
     
     try:
+        conn = get_conn()
         cur = conn.cursor()
         
         cur.execute("SELECT rating FROM ratings WHERE movie_id=%s", (movie_id,))
@@ -912,22 +994,27 @@ async def update_avg_rating(movie_id: str = Query(...)):
         """, (movie_id, ratings_sum, total_ratings, avg_rating)) 
         
         conn.commit()
-        cur.close()
         
         return {"message": "average rating updated"}
     except Exception as e:
         logging.error(f"Error during user search: {e}")
-        conn.rollback()
+        if conn and not conn.closed:
+            conn.rollback()
         raise HTTPException(status_code=500, detail="Database error")
     finally:
-        if 'cur' in locals() and not cur.closed:
+        if cur and not cur.closed:
             cur.close()
+        if conn and not conn.closed:
+            conn.close()
             
 @app.get("/fetch_profile_pic")
 async def fetch_profile_pic(request: Request):
     username = request.session.get("user")
+    conn = None
+    cur = None
+    
     try:
-        
+        conn = get_conn()
         cur = conn.cursor()
         
         cur.execute(
@@ -944,11 +1031,14 @@ async def fetch_profile_pic(request: Request):
         return {"profile_pic": profile_pic_url}
     except Exception as e:
         logging.error(f"Error during user search: {e}")
-        conn.rollback()
+        if conn and not conn.closed:
+            conn.rollback()
         raise HTTPException(status_code=500, detail="Database error")
     finally:
-        if 'cur' in locals() and not cur.closed:
+        if cur and not cur.closed:
             cur.close()
+        if conn and not conn.closed:
+            conn.close()
             
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5050))

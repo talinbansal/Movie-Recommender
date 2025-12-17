@@ -11,13 +11,14 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 url = urlparse(DATABASE_URL) # Parse the database URL
 
 # Establish the connection
-conn = psycopg2.connect(
-    dbname=url.path[1:],
-    user=url.username,
-    password=url.password, 
-    host=url.hostname,
-    port=url.port
-)
+def get_conn():
+    return psycopg2.connect(
+        dbname=url.path[1:],
+        user=url.username,
+        password=url.password,
+        host=url.hostname,
+        port=url.port
+    )
 
 # AWS S3
 s3 = boto3.client(
