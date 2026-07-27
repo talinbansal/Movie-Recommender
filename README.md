@@ -3,8 +3,6 @@
 Popcorn Pick is a personalized movie discovery web app that uses **semantic analysis** to recommend similar films based on movie overviews and genres.  
 It combines machine learning, full-stack web development, and scalable deployment practices into one integrated system.
 
-🌐 **Live App:** [https://www.popcornpick.app](https://www.popcornpick.app)
-
 ---
 
 ## 🚀 Features
